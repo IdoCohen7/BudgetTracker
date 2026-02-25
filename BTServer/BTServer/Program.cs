@@ -1,10 +1,14 @@
 using BTServer.Data;
+using BTServer.DTOs.User;
 using BTServer.Models;
 using BTServer.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using BTServer.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +18,13 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Register FluentValidation validators
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateExpenseValidator>();
+
+// Add FluentValidation to ASP.NET Core MVC pipeline
+builder.Services.AddFluentValidationAutoValidation();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();

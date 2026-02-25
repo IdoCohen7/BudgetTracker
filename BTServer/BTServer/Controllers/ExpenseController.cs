@@ -33,27 +33,12 @@ namespace BTServer.Controllers
 
         // GET: api/Expense/chart
         [HttpGet("chart")]
-        public async Task<ActionResult<Dictionary<string, decimal>>> GetExpensesChart()
+        public async Task<ActionResult<List<ExpenseInCategory>>> GetExpensesChart()
         {
             try
             {
                 var chart = await _service.GetExpensesChart();
                 return Ok(chart);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
-        // GET: api/Expense/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<ExpenseDTO>> Get(int id)
-        {
-            try
-            {
-                // TODO: Implement GetExpenseById in service
-                return Ok("Expense details for id: " + id);
             }
             catch (Exception ex)
             {

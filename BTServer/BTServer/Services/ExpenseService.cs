@@ -20,15 +20,6 @@ namespace BTServer.Services
 
         public async Task<ExpenseDTO> CreateExpense(CreateExpense createExpenseRequest)
         {
-           
-
-            // Validate that the category is a valid enum value
-            // TODO: REMOVE when validators are put into project
-            if (!Enum.IsDefined(typeof(Category), createExpenseRequest.category))
-            {
-                throw new Exception($"ERROR: Invalid category value. Valid categories are: {string.Join(", ", Enum.GetNames(typeof(Category)))}");
-            }
-
             try
             {
                 var newExpense = new Expense
