@@ -3,6 +3,7 @@ using BTServer.DTOs.Expense;
 using BTServer.Models;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
+using System.Collections;
 using System.Security.Claims;
 
 namespace BTServer.Services
@@ -19,15 +20,10 @@ namespace BTServer.Services
 
         public async Task<ExpenseDTO> CreateExpense(CreateExpense createExpenseRequest)
         {
-            var userIdString = _contextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (string.IsNullOrEmpty(userIdString))
-            {
-                throw new Exception("ERROR: You are not authorized to perform this action");
-            }
-            int userId = int.Parse(userIdString);
+           
 
             // Validate that the category is a valid enum value
+            // TODO: REMOVE when validators are put into project
             if (!Enum.IsDefined(typeof(Category), createExpenseRequest.category))
             {
                 throw new Exception($"ERROR: Invalid category value. Valid categories are: {string.Join(", ", Enum.GetNames(typeof(Category)))}");
@@ -40,7 +36,7 @@ namespace BTServer.Services
                     Description = createExpenseRequest.description,
                     Sum = createExpenseRequest.sum,
                     Category = createExpenseRequest.category,
-                    UserId = userId  
+                    UserId = GetUserId() 
                 };
 
                 _context.Expenses.Add(newExpense);
@@ -55,12 +51,10 @@ namespace BTServer.Services
             }
         }
 
-
-        public async Task<List<ExpenseDTO>> GetAllUserExpenses()
+        private int GetUserId()
         {
             var userIdString = _contextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            Console.WriteLine("x:", userIdString);
 
             if (string.IsNullOrEmpty(userIdString))
             {
@@ -68,9 +62,14 @@ namespace BTServer.Services
             }
             int userId = int.Parse(userIdString);
 
+            return userId;
+        }
+
+        public async Task<List<ExpenseDTO>> GetAllUserExpenses()
+        { 
             try
             {
-                var expenses = await _context.Expenses.Where(e => e.UserId == userId).AsNoTracking().ToListAsync();
+                var expenses = await _context.Expenses.Where(e => e.UserId == GetUserId()).AsNoTracking().ToListAsync();
 
                 return expenses.Adapt<List<ExpenseDTO>>();
             }
@@ -79,9 +78,23 @@ namespace BTServer.Services
             {
                 throw;
             }
-
-
         }
+
+        public async Task<List<ExpenseInCategory>> GetExpensesChart()
+        {
+            var expensesChart = await _context.Expenses
+                .Where(e => e.UserId == GetUserId())
+                .GroupBy(e => e.Category)
+                .Select(g => new ExpenseInCategory(
+                    g.Key,
+                    g.Sum(e => e.Sum)
+                ))
+                .ToListAsync();
+
+            return expensesChart;
+        }
+
+       
     }
 }
 

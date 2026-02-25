@@ -1,4 +1,5 @@
 using BTServer.Data;
+using BTServer.Models;
 using BTServer.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -66,6 +67,8 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+
 
 builder.Services.AddDbContext<DBContext>(options =>
 {

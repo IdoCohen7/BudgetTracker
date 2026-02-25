@@ -6,5 +6,6 @@ namespace BTServer.Services
     {
         Task<ExpenseDTO> CreateExpense(CreateExpense createExpenseRequest);
         Task<List<ExpenseDTO>> GetAllUserExpenses();
+        Task<List<ExpenseInCategory>> GetExpensesChart();
     }
 }

@@ -3,14 +3,11 @@ using BTServer.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace BTServer.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize] 
-
+    [Authorize]
     public class ExpenseController : ControllerBase
     {
         private readonly IExpenseService _service;
@@ -18,7 +15,8 @@ namespace BTServer.Controllers
         {
             _service = service;
         }
-        // GET: api/<ExpenseController>
+
+        // GET: api/Expense
         [HttpGet]
         public async Task<ActionResult<List<ExpenseDTO>>> Get()
         {
@@ -33,14 +31,37 @@ namespace BTServer.Controllers
             }
         }
 
-        // GET api/<ExpenseController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        // GET: api/Expense/chart
+        [HttpGet("chart")]
+        public async Task<ActionResult<Dictionary<string, decimal>>> GetExpensesChart()
         {
-            return "value";
+            try
+            {
+                var chart = await _service.GetExpensesChart();
+                return Ok(chart);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
-        // POST api/<ExpenseController>
+        // GET: api/Expense/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<ExpenseDTO>> Get(int id)
+        {
+            try
+            {
+                // TODO: Implement GetExpenseById in service
+                return Ok("Expense details for id: " + id);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        // POST: api/Expense
         [HttpPost]
         public async Task<ActionResult<ExpenseDTO>> Post([FromBody] CreateExpense createExpenseRequest)
         {
@@ -48,27 +69,11 @@ namespace BTServer.Controllers
             {
                 var newExpense = await _service.CreateExpense(createExpenseRequest);
                 return Ok(newExpense);
-
             }
-
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
-
-
-        }
-
-        // PUT api/<ExpenseController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/<ExpenseController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
         }
     }
 }
