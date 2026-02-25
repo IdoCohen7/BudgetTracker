@@ -1,5 +1,8 @@
-﻿namespace BTServer.Models
+﻿using System.Text.Json.Serialization;
+
+namespace BTServer.Models
 {
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum Category
     {
         Housing = 0,

@@ -16,11 +16,43 @@ namespace BTServer.Controllers
         {
             _service = service;
         }
+
         // GET api/<AuthController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public async Task<ActionResult<UserDTO>> Get(int id)
         {
-            return "value";
+            try
+            {
+                var user = await _service.GetUser(id);
+                if (user == null)
+                {
+                    return NotFound("No user matches this id");
+                }
+
+                return Ok(user);
+
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        // GET api/<AuthController>/5
+        [HttpPost("Login")]
+        public async Task<ActionResult<UserDTO>> Login([FromBody]LoginRequest loginRequest)
+        {
+            try
+            {
+                var user = await _service.Login(loginRequest);
+
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         // POST api/<AuthController>
@@ -31,15 +63,12 @@ namespace BTServer.Controllers
             {
                 var newUser = await _service.Register(request);
 
-                return Ok(newUser);
-                
+                return CreatedAtAction(nameof(Get), new { id = newUser.id }, newUser);
             }
-
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
-
         }
 
         

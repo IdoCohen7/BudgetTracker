@@ -21,7 +21,8 @@ namespace BTServer.Data.Configurations
                 .HasPrecision(18, 2);
 
             builder.Property(x => x.Category)
-                .IsRequired();
+                .IsRequired()
+                .HasConversion<string>();
 
             builder.Property(x => x.UserId)
                 .IsRequired();  
