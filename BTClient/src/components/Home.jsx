@@ -1,38 +1,49 @@
-import { useLoaderData } from "react-router-dom";
 import { Container, Row, Col, Card } from "react-bootstrap";
-import expenseService from "../services/expenseService";
 import Header from "./Header";
-import ExpensesList from "./expenses/ExpensesList";
+import { ExpenseProvider, useExpenses } from "../contexts/ExpenseContext";
+import { Suspense } from "react";
+import { lazy } from "react";
+import { Spinner } from "react-bootstrap";
 
-// loader function
-export async function homeLoader() {
-  try {
-    const response = await expenseService.getAllExpenses();
-    return response.data;
-  } catch (error) {
-    console.error("Error loading expenses:", error);
-    return [];
-  }
-}
+const ExpensesList = lazy(() => import("./expenses/ExpensesList"));
 
-export default function Home() {
-  const expenses = useLoaderData();
+function HomeContent() {
+  const { expenses, loading, hasMore, loadMore } = useExpenses();
 
   return (
     <Container fluid className="home-page py-4">
-      {/* Header Section */}
-      <Header expenses={expenses} />
-
-      {/* Expenses List */}
+      <Header />
       <Row>
         <Col xs={12}>
           <Card className="border-0 shadow-sm">
             <Card.Body className="p-0">
-              <ExpensesList expenses={expenses} />
+              <Suspense
+                fallback={
+                  <div className="text-center py-5">
+                    <Spinner animation="border" variant="primary" />
+                    <span className="ms-2 d-block">Loading...</span>
+                  </div>
+                }
+              >
+                <ExpensesList
+                  expenses={expenses}
+                  hasMore={hasMore}
+                  onLoadMore={loadMore}
+                  loading={loading}
+                />
+              </Suspense>
             </Card.Body>
           </Card>
         </Col>
       </Row>
     </Container>
+  );
+}
+
+export default function Home() {
+  return (
+    <ExpenseProvider>
+      <HomeContent />
+    </ExpenseProvider>
   );
 }

@@ -2,21 +2,31 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./App.css";
 import Login from "./components/Login";
 import Register from "./components/Register";
-import Home, { homeLoader } from "./components/Home";
+import Home from "./components/Home";
+import Chart, { chartLoader } from "./components/Chart";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: "/register",
     element: <Register />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: "/",
     element: <Home />,
-    loader: homeLoader,
+    errorElement: <ErrorBoundary />,
+  },
+  {
+    path: "/chart",
+    element: <Chart />,
+    loader: chartLoader,
+    errorElement: <ErrorBoundary />,
   },
 ]);
 

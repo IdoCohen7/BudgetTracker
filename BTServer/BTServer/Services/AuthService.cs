@@ -44,6 +44,8 @@ namespace BTServer.Services
                 throw new Exception("Passwords do not match");
             }
 
+
+
             var newUser = new User
             {
                 Name = request!.name,

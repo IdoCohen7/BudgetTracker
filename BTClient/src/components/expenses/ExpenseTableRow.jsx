@@ -1,4 +1,3 @@
-import { Badge } from "react-bootstrap";
 import {
   formatDate,
   formatCurrency,
@@ -6,18 +5,28 @@ import {
 } from "../../utils/utils";
 
 export default function ExpenseTableRow({ expense }) {
+  const categoryColor = getCategoryColor(expense.category);
+
   return (
     <tr>
       <td className="text-muted">{formatDate(expense.createdAt)}</td>
       <td className="fw-medium">{expense.description || "N/A"}</td>
       <td>
-        <Badge bg={getCategoryColor(expense.category)} className="px-3 py-2">
+        <span
+          className="px-3 py-2 rounded"
+          style={{
+            backgroundColor: categoryColor,
+            color: "white",
+            border: "none",
+            display: "inline-block",
+            fontSize: "0.875rem",
+            fontWeight: "500",
+          }}
+        >
           {expense.category || "Other"}
-        </Badge>
+        </span>
       </td>
-      <td className="text-end fw-bold text-danger">
-        {formatCurrency(expense.sum)}
-      </td>
+      <td className="text-end fw-bold ">{formatCurrency(expense.sum)}</td>
     </tr>
   );
 }

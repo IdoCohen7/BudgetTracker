@@ -3,10 +3,13 @@ import { Form, Button } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { Spinner } from "react-bootstrap";
 import authService from "../services/authService";
+import { parseErrorResponse } from "../utils/utils";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -14,14 +17,18 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null);
+
     try {
-      const response = await authService.Login(email, password);
-      console.log("Login successful:", response.data);
+      const response = await authService.Login(
+        formData.email,
+        formData.password,
+      );
       setTokenInLocalStorage(response.data.token);
       navigate("/");
     } catch (error) {
       console.error("Login failed:", error);
-      setError(error.response?.data || "Login failed");
+      setError(parseErrorResponse(error, "Login failed. Please try again."));
     } finally {
       setIsLoading(false);
     }
@@ -48,8 +55,10 @@ export default function Login() {
           <Form.Control
             type="email"
             placeholder="Enter email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={formData.email}
+            onChange={(e) =>
+              setFormData({ ...formData, email: e.target.value })
+            }
             disabled={isLoading}
           />
           <Form.Text className="text-muted">
@@ -62,18 +71,14 @@ export default function Login() {
           <Form.Control
             type="password"
             placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={formData.password}
+            onChange={(e) =>
+              setFormData({ ...formData, password: e.target.value })
+            }
             disabled={isLoading}
           />
         </Form.Group>
-        <Form.Group className="mb-3" controlId="formBasicCheckbox">
-          <Form.Check
-            type="checkbox"
-            label="Remember me"
-            disabled={isLoading}
-          />
-        </Form.Group>
+
         <Button variant="primary" type="submit" disabled={isLoading}>
           {isLoading ? (
             <>

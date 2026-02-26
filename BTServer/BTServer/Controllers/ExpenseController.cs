@@ -18,11 +18,11 @@ namespace BTServer.Controllers
 
         // GET: api/Expense
         [HttpGet]
-        public async Task<ActionResult<List<ExpenseDTO>>> Get()
+        public async Task<ActionResult<List<ExpenseDTO>>> Get( [FromQuery] PageRequest p)
         {
             try
             {
-                var expenses = await _service.GetAllUserExpenses();
+                var expenses = await _service.GetAllUserExpenses(p);
                 return Ok(expenses);
             }
             catch (Exception ex)
@@ -33,7 +33,7 @@ namespace BTServer.Controllers
 
         // GET: api/Expense/chart
         [HttpGet("chart")]
-        public async Task<ActionResult<List<ExpenseInCategory>>> GetExpensesChart()
+        public async Task<ActionResult<MonthlyDataWithTotal>> GetExpensesChart()
         {
             try
             {

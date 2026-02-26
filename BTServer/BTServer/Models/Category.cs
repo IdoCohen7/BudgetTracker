@@ -5,10 +5,10 @@ namespace BTServer.Models
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum Category
     {
-        Housing = 0,
-        Groceries = 1,
-        Savings = 2,
-        Fun = 3,
-        Other = 4
+        Housing = 1,
+        Groceries = 2,
+        Savings = 3,
+        Fun = 4,
+        Other = 5
     }
 }

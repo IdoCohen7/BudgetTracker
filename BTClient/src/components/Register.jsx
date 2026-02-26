@@ -1,28 +1,58 @@
 import { Form, Button } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import authService from "../services/authService";
 import { useState } from "react";
+import { parseErrorResponse } from "../utils/utils";
 
 export default function Register() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    passwordConfirm: "",
+  });
+
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+  const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setError(null);
+    setSuccess(false);
+
     try {
-      const response = await authService.Register(
-        name,
-        email,
-        password,
-        passwordConfirm,
+      const registrationResponse = await authService.Register(
+        formData.name,
+        formData.email,
+        formData.password,
+        formData.passwordConfirm,
       );
-      console.log("Registration response:", response);
+      setSuccess(true);
+
+      // auto-login after successful registration
+      try {
+        const loginResponse = await authService.Login(
+          formData.email,
+          formData.password,
+        );
+
+        localStorage.setItem("authToken", loginResponse.data.token);
+
+        setTimeout(() => {
+          navigate("/");
+        }, 1500);
+      } catch (loginError) {
+        console.error("Auto-login failed:", loginError);
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
+      }
     } catch (error) {
-      setError(error.response?.data || "Registration failed");
       console.error("Registration error:", error);
+      setError(
+        parseErrorResponse(error, "Registration failed. Please try again."),
+      );
     }
   };
   return (
@@ -30,13 +60,18 @@ export default function Register() {
       <Form className="form-container" onSubmit={handleRegister}>
         <h2>Register</h2>
         {error && <div className="alert alert-danger">{error}</div>}
+        {success && (
+          <div className="alert alert-success">
+            Registration successful! Logging you in...
+          </div>
+        )}
         <Form.Group className="mb-3" controlId="formName">
           <Form.Label>Name</Form.Label>
           <Form.Control
             type="text"
             placeholder="Enter name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           />
         </Form.Group>
         <Form.Group className="mb-3" controlId="formRegisterEmail">
@@ -44,8 +79,10 @@ export default function Register() {
           <Form.Control
             type="email"
             placeholder="Enter email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={formData.email}
+            onChange={(e) =>
+              setFormData({ ...formData, email: e.target.value })
+            }
           />
           <Form.Text className="text-muted">
             We'll never share your email with anyone else.
@@ -57,8 +94,10 @@ export default function Register() {
           <Form.Control
             type="password"
             placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={formData.password}
+            onChange={(e) =>
+              setFormData({ ...formData, password: e.target.value })
+            }
           />
         </Form.Group>
 
@@ -67,8 +106,10 @@ export default function Register() {
           <Form.Control
             type="password"
             placeholder="Confirm password"
-            value={passwordConfirm}
-            onChange={(e) => setPasswordConfirm(e.target.value)}
+            value={formData.passwordConfirm}
+            onChange={(e) =>
+              setFormData({ ...formData, passwordConfirm: e.target.value })
+            }
           />
         </Form.Group>
 

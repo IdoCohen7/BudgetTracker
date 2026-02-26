@@ -56,11 +56,17 @@ namespace BTServer.Services
             return userId;
         }
 
-        public async Task<List<ExpenseDTO>> GetAllUserExpenses()
+        public async Task<List<ExpenseDTO>> GetAllUserExpenses(PageRequest p)
         { 
             try
             {
-                var expenses = await _context.Expenses.Where(e => e.UserId == GetUserId()).AsNoTracking().ToListAsync();
+                var expenses = await _context.Expenses
+                    .Where(e => e.UserId == GetUserId())
+                    .OrderByDescending(e => e.CreatedAt)
+                    .Skip((p.pageNumber-1) * p.pageSize)
+                    .Take(p.pageSize)
+                    .AsNoTracking()
+                    .ToListAsync();
 
                 return expenses.Adapt<List<ExpenseDTO>>();
             }
@@ -71,10 +77,11 @@ namespace BTServer.Services
             }
         }
 
-        public async Task<List<ExpenseInCategory>> GetExpensesChart()
+        public async Task<MonthlyDataWithTotal> GetExpensesChart()
         {
-            var expensesChart = await _context.Expenses
-                .Where(e => e.UserId == GetUserId())
+
+            var categoriesList = await _context.Expenses
+                .Where(e => e.UserId == GetUserId() && e.CreatedAt.Month == DateTime.Now.Month)
                 .GroupBy(e => e.Category)
                 .Select(g => new ExpenseInCategory(
                     g.Key,
@@ -82,10 +89,11 @@ namespace BTServer.Services
                 ))
                 .ToListAsync();
 
-            return expensesChart;
-        }
+            var totalSum = categoriesList.Sum(e => e.totalExpense);
 
-       
+
+            return new MonthlyDataWithTotal(categoriesList, totalSum);
+        }
     }
 }
 

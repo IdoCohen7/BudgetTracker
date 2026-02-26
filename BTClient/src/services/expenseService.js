@@ -1,9 +1,13 @@
 import api from "../api/axiosInstance";
 
 const expenseService = {
-  getAllExpenses: () => {
-    let url = `api/Expense`;
-    return api.get(url);
+  getAllExpenses: (pageNumber = 1, pageSize = 10) => {
+    return api.get("/api/Expense", {
+      params: {
+        pageNumber,
+        pageSize,
+      },
+    });
   },
   createExpense: (description, sum, category) => {
     return api.post("/api/Expense", {

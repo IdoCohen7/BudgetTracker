@@ -1,4 +1,4 @@
-import { Card, Badge } from "react-bootstrap";
+import { Card } from "react-bootstrap";
 import {
   formatDate,
   formatCurrency,
@@ -6,6 +6,8 @@ import {
 } from "../../utils/utils";
 
 export default function ExpenseCard({ expense }) {
+  const categoryColor = getCategoryColor(expense.category);
+
   return (
     <Card className="border-0 border-bottom rounded-0">
       <Card.Body className="py-3">
@@ -20,9 +22,19 @@ export default function ExpenseCard({ expense }) {
             {formatCurrency(expense.sum)}
           </h5>
         </div>
-        <Badge bg={getCategoryColor(expense.category)} className="px-3 py-1">
+        <span
+          className="px-3 py-1 rounded"
+          style={{
+            backgroundColor: categoryColor,
+            color: "white",
+            border: "none",
+            display: "inline-block",
+            fontSize: "0.875rem",
+            fontWeight: "500",
+          }}
+        >
           {expense.category || "Other"}
-        </Badge>
+        </span>
       </Card.Body>
     </Card>
   );
