@@ -1,41 +1,65 @@
 # Expense Tracker Project
 
-## ספריות בשימוש
+## Tech Stack
 
-### צד שרת (Backend)
+### Backend
 
-- **EntityFramework Core:** מידול הקשרים בין הישויות באפליקציה וחיבור ל-SQL Server.
-- **FluentValidation:** הוספת ולידציות על תהליכי יצירת משתמש ויצירת הוצאות.
-- **BCrypt.Net:** הצפנת סיסמאות בבסיס הנתונים לאבטחה מרבית.
-- **JwtBearer:** הטמעת מנגנון אבטחה ואימות משתמשים (Authentication).
-- **Mapster:** מיפוי יעיל של מודלים פנימיים לאובייקטי נתונים (DTOs).
+- **EntityFramework Core:** Modeling relationships between entities and connecting to SQL Server.
+- **FluentValidation:** Implementing validation logic for user registration and expense creation.
+- **BCrypt.Net:** Secure password hashing for database storage.
+- **JwtBearer:** Implementing authentication and authorization mechanisms.
+- **Mapster:** Efficient mapping between internal models and Data Transfer Objects (DTOs).
 
-### צד לקוח (Frontend)
+### Frontend
 
-- **React-Bootstrap:** ספריית עיצוב רספונסיבית ששימשה לבניית כל רכיבי הממשק.
-- **Axios:** ניהול ושליחת קריאות API לשרת.
-- **Recharts:** הצגת נתונים ויזואלית באמצעות גרפים.
-- **React-Router-Dom:** ניהול הניווט באפליקציה לחוויית משתמש מהירה וחלקה.
+- **React-Bootstrap:** UI library used for building responsive components throughout the application.
+- **Axios:** Managing API requests and communication with the server.
+- **Recharts:** Visualizing data through interactive charts.
+- **React-Router-Dom:** Handling seamless client-side navigation.
 
 ---
 
-## בחירות ארכיטקטוניות
+## Architectural Decisions
 
-### צד שרת
+### Backend
 
-המערכת מבוססת על שתי ישויות מרכזיות: **משתמש** ו**הוצאה**.
+The system is built around two primary entities: **User** and **Expense**.
 
-- **קשרי גומלין:** ביססתי קשר של יחיד לרבים (One-to-Many), כך שכל הוצאה משויכת למשתמש אחד, ולכל משתמש יכולות להיות הוצאות רבות.
-- **ניהול קטגוריות:** שדה הקטגוריה מומש כ-`Enum` מתוך הבנה שמדובר בטווח ערכים סגור וקבוע מראש.
-- **אבטחה והפרדה:** נעשה שימוש ב-DTOs כדי לא לחשוף את מימוש הדאטאבייס הפנימי וכדי לאגד בקשות API בצורה מסודרת.
-- **שכבות המערכת:** קיימת הפרדה ברורה בין השכבות:
-  - ה-**DbContext** אחראי על החיבור לבסיס הנתונים.
-  - ה-**Service** מכיל את הלוגיקה העסקית ומוזרק לשכבות הרלוונטיות.
-  - ה-**Controllers** אחראים אך ורק על חשיפת Endpoints והחזרת תגובות HTTP.
-- **אימות נתונים:** השתמשתי ב-Validators לאימות פורמט המידע בבקשות POST להרשמה ויצירת הוצאה.
+- **Relationships:** Established a **One-to-Many** relationship, where each expense belongs to a single user, and a user can manage multiple expenses.
+- **Category Management:** The expense category is stored as an **Enum**, ensuring data integrity by restricting input to a predefined set of options.
+- **Encapsulation:** Used **DTOs** to prevent exposing the internal database schema and to bundle API request data.
+- **Layered Architecture:** Clear separation of concerns was implemented:
+  - **DbContext:** Manages the connection to the database.
+  - **Service Layer:** Contains the business logic and is injected where needed.
+  - **Controllers:** Responsible solely for exposing Endpoints and returning HTTP responses.
+- **Data Validation:** Utilized specialized validators to verify the format of incoming data for registration and expense creation POST requests.
 
-### צד לקוח
+### Frontend
 
-- **ניהול מצב (State Management):** בחרתי ב-**Context API** לניהול המידע על ההוצאות שנמשך מהשרת. במידה והיה צורך רחב יותר במידע על המשתמש, הייתי מייצר גם AuthContext ייעודי.
-- **מבנה שכבות:** קיימת שכבת API המגדירה את הגדרות ה-Axios, ושכבת Service המממשת את המתודות מול ה-Controllers בשרת.
-- **יעילות הקוד:** פונקציות שחוזרות על עצמן הועברו לקובץ **Utils** כדי למנוע שכפול קוד ולשמור על סדר.
+- **State Management:** Utilized **Context API** to manage expense data fetched from the server. (An AuthContext would be implemented for broader user-data requirements).
+- **Layered Structure:** Separated the **API layer** (Axios configuration) from the **Service layer** (methods matching the backend controllers).
+- **Code Reusability:** Repeated logic was extracted into a **Utils** file to prevent code duplication and maintain a clean codebase.
+
+---
+
+## Installation & Setup
+
+### Prerequisites
+
+- .NET 8 SDK
+- Node.js (LTS version)
+- SQL Server
+
+### Backend Setup
+
+1. Navigate to the `/api` directory.
+2. Update the `ConnectionStrings` in `appsettings.json`.
+3. Run `dotnet ef database update` to create the database schema.
+4. Run `dotnet run` to start the server.
+
+### Frontend Setup
+
+1. Navigate to the `/client` directory.
+2. Run `npm install` to install dependencies.
+3. Run `npm start` to launch the development server.
+4. Make sure that the env file matches your api endpoint url.
